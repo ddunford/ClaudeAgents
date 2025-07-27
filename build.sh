@@ -13,6 +13,12 @@ done
 
 echo "🚀 Starting MCP Central Hub build process..."
 
+# Run setupmcp.sh if MCP servers haven't been installed
+if [ ! -d ".mcp_installed" ] || [ -z "$(ls -A .mcp_installed 2>/dev/null)" ]; then
+    echo "🔧 First run detected - installing MCP servers..."
+    ./setupmcp.sh
+fi
+
 # Ensure src/specs exists (specs will always exist as it's in git)
 mkdir -p src/specs
 
