@@ -13,29 +13,31 @@ done
 
 echo "🚀 Starting MCP Central Hub build process..."
 
-# Ensure src directory exists
-mkdir -p src
+# Ensure src/specs exists (specs will always exist as it's in git)
+mkdir -p src/specs
 
-# Run setupmcp.sh to install all required MCP servers
-# ./setupmcp.sh
-
-# Initialize Claude with agents
-echo "🤖 Running /init to load agents..."
-claude --dangerously-skip-permissions -p "/init"
-
-# Optionally regenerate CLAUDE.md
-if [ "$REGEN_CLAUDE_MD" = true ]; then
-    echo "📝 Regenerating CLAUDE.md..."
-    # Use sequential-thinking for structured documentation generation
-    # Use filesystem for writing the file
-    # Use memory-bank to retain project context
-    claude -p "/init"
-    # claude -p "Using sequential-thinking to organize, and filesystem to write, please generate a comprehensive CLAUDE.md file that documents this project's architecture, development guidelines, and technical requirements. Include sections for project overview, commands, architecture, development guidelines, testing requirements, and tech stack. Make it detailed and production-ready."
+# Initialize Claude with agents only if CLAUDE.md doesn't exist or REGEN_CLAUDE_MD is true
+if [ ! -f "CLAUDE.md" ] || [ "$REGEN_CLAUDE_MD" = true ]; then
+    echo "🤖 Running /init to load agents..."
+    claude --dangerously-skip-permissions -p "/init"
 fi
 
-# Ensure specs directory exists
-if [ ! -d "./src/specs" ]; then
-    echo "❌ Error: ./src/specs directory not found. Please create it and add your specification files."
+# Generate fresh specs and documentation in src/specs
+echo "📝 Generating fresh specs and documentation in src/specs..."
+claude --dangerously-skip-permissions -p "Using sequential-thinking and filesystem agents, please:
+1. Read and analyze all specification files in /specs
+2. Generate enhanced, machine-optimized versions of these specs in ./src/specs
+3. Add additional documentation files that will help other agents understand:
+   - The system architecture
+   - API contracts
+   - Data models
+   - Testing requirements
+   - Integration points
+Make sure the generated specs maintain all requirements from the original specs while being optimized for machine processing."
+
+# Ensure specs were generated
+if [ -z "$(ls -A ./src/specs 2>/dev/null)" ]; then
+    echo "❌ Error: No specs were generated in ./src/specs. Please ensure there are specification files in /specs to work from."
     exit 1
 fi
 

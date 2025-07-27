@@ -1,7 +1,9 @@
 
 # Project directories and files
-/src/
-/specs/
+/src/*
+!/src/.gitkeep
+/specs/*
+!/specs/.gitkeep
 /.claude/installed_servers/
 /CLAUDE.md
 
