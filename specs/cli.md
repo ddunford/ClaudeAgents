@@ -13,7 +13,7 @@ munero <command> [options]
 munero build "Create a React calculator with dark mode"
 
 # Build from specs directory
-munero build --specs ./specs
+munero build --specs ./my-specs
 
 # Build with specific iteration limit
 munero build --max-iterations 5
@@ -60,8 +60,8 @@ munero report
 
 ### Project Commands
 ```bash
-# Initialize new project
-munero init [project-name]
+# Initialize Munero in current directory
+munero init
 
 # Add MCP server
 munero mcp add <server>
@@ -131,15 +131,14 @@ munero sessions clean
 
 ## Configuration File
 ```javascript
-// munero.config.js
+// .munero/config.js
 module.exports = {
   // Build Configuration
   build: {
     maxIterations: 10,
     minCoverage: 90,
     maxCriticalIssues: 0,
-    timeout: 60,
-    specs: './specs'
+    timeout: 60
   },
 
   // Iteration Control
@@ -212,7 +211,7 @@ munero.on('report:generate', (report) => {});
 munero build "Create a React app with authentication"
 
 # Build from specs with options
-munero build --specs ./specs --max-iterations 5 --min-coverage 90
+munero build --specs ./my-specs --max-iterations 5 --min-coverage 90
 ```
 
 ### Progress Monitoring
@@ -226,8 +225,8 @@ munero report --format html --output ./report
 
 ### Development Flow
 ```bash
-# Initialize project
-munero init my-project
+# Initialize in current directory
+munero init
 
 # Start development mode
 munero dev --watch --hot

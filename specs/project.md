@@ -7,12 +7,12 @@ A TypeScript-based autonomous build system that uses Claude's SDK to continuousl
 
 ### 1. Dual Input System
 - Direct prompt input for quick starts
-- Structured /specs directory for detailed requirements
+- Structured specs directory (configurable via --specs)
 - Automatic conversion of prompts to structured specs
 
 ### 2. Specification Enhancement
 - Analysis of input specs or prompts
-- Generation of machine-optimized specs in src/specs
+- Generation of machine-optimized specs in .munero/specs
 - Continuous refinement based on implementation feedback
 - Automatic documentation generation
 
@@ -41,7 +41,7 @@ A TypeScript-based autonomous build system that uses Claude's SDK to continuousl
 - Integration test results
 
 ### 6. Agent Collaboration
-- Specialized agents for different aspects
+- Pre-configured agents in .munero/agents
 - Inter-agent communication
 - Shared knowledge base
 - Coordinated improvements
@@ -84,21 +84,26 @@ A TypeScript-based autonomous build system that uses Claude's SDK to continuousl
 
 ## Project Structure
 ```
-munero/
+munero/                # Global package structure
 ├── src/
-│   ├── core/           # Core build system
-│   ├── agents/         # Agent implementations
-│   ├── feedback/       # Feedback loop system
-│   ├── builders/       # Build process implementations
-│   ├── testing/        # Testing framework
-│   ├── validation/     # Validation system
-│   ├── utils/          # Shared utilities
-│   └── cli/           # CLI implementation
-├── specs/             # User specifications
-├── src/specs/         # Generated specifications
-├── tests/             # Test suite
-├── docs/             # Documentation
-└── examples/         # Usage examples
+│   ├── core/         # Core build system
+│   ├── agents/       # Agent implementations
+│   ├── feedback/     # Feedback loop system
+│   ├── builders/     # Build process implementations
+│   ├── testing/      # Testing framework
+│   ├── validation/   # Validation system
+│   ├── utils/        # Shared utilities
+│   └── cli/          # CLI implementation
+├── tests/            # Package test suite
+└── docs/             # Package documentation
+
+.munero/              # Created in user's project (hidden)
+├── agents/           # Pre-configured Claude agents
+├── specs/           # Generated enhanced specifications
+├── feedback/        # Feedback loop data
+├── state/          # Build state and history
+├── cache/          # Build cache
+└── logs/           # Build and agent logs
 ```
 
 ## Success Criteria
