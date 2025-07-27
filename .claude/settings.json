@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Filesystem(*)",      // For filesystem server
+      "SequentialThinking(*)", // For sequential-thinking server
+      "MemoryBank(*)",      // For memory-bank server
+      "Puppeteer(*)",       // For puppeteer server
+      "Fetch(*)",           // For fetch server
+      "BrowserTools(*)",    // For browser-tools server
+      "APIDog(*)",          // For apidog server
+      "Supabase(*)",        // For supabase server
+      "GitHub(*)",          // For github server
+      "Slack(*)",           // For slack server
+      "Notion(*)",          // For notion server
+      "Zapier(*)"           // For zapier server
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "env": {
+    "DISABLE_TELEMETRY": "1"
+  }
+}

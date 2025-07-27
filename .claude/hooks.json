@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "post-edit": [
+      {
+        "name": "code-review",
+        "agent": "code-reviewer",
+        "prompt": "Please review the changes made to {filename} for:\n1. Conformance to project specifications in ./specs\n2. Code quality and best practices\n3. Potential bugs or edge cases\n4. Documentation completeness\n5. Test coverage requirements\n\nIf any issues are found, please describe them and suggest fixes.",
+        "blocking": true
+      },
+      {
+        "name": "security-audit",
+        "agent": "security-auditor",
+        "prompt": "Please perform a security audit of the changes made to {filename}, checking for:\n1. Security vulnerabilities\n2. Data validation issues\n3. Authentication/authorization gaps\n4. Secure coding practices\n5. Compliance with security requirements in CLAUDE.md\n\nIf any security issues are found, please describe them and suggest fixes.",
+        "blocking": true
+      }
+    ]
+  }
+} 
