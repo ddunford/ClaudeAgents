@@ -17,11 +17,11 @@ echo "🚀 Starting MCP Central Hub build process..."
 mkdir -p src
 
 # Run setupmcp.sh to install all required MCP servers
-./setupmcp.sh
+# ./setupmcp.sh
 
 # Initialize Claude with agents
 echo "🤖 Running /init to load agents..."
-claude -p "/init"
+claude --dangerously-skip-permissions -p "/init"
 
 # Optionally regenerate CLAUDE.md
 if [ "$REGEN_CLAUDE_MD" = true ]; then
@@ -29,7 +29,8 @@ if [ "$REGEN_CLAUDE_MD" = true ]; then
     # Use sequential-thinking for structured documentation generation
     # Use filesystem for writing the file
     # Use memory-bank to retain project context
-    claude -p "Using sequential-thinking to organize, and filesystem to write, please generate a comprehensive CLAUDE.md file that documents this project's architecture, development guidelines, and technical requirements. Include sections for project overview, commands, architecture, development guidelines, testing requirements, and tech stack. Make it detailed and production-ready."
+    claude -p "/init"
+    # claude -p "Using sequential-thinking to organize, and filesystem to write, please generate a comprehensive CLAUDE.md file that documents this project's architecture, development guidelines, and technical requirements. Include sections for project overview, commands, architecture, development guidelines, testing requirements, and tech stack. Make it detailed and production-ready."
 fi
 
 # Ensure specs directory exists
@@ -71,6 +72,6 @@ Important requirements:
 - Read specifications only from ./src/specs directory
 - Choose appropriate language specialist agents based on architectural decisions and requirements
 
-Please proceed step by step, ensuring each component is properly implemented before moving to the next." | claude
+Please proceed step by step, ensuring each component is properly implemented before moving to the next." | claude --dangerously-skip-permissions
 
 echo "✅ Build process completed!"
