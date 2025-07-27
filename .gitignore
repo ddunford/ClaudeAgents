@@ -6,7 +6,9 @@
 !/specs/.gitkeep
 /.claude/installed_servers/
 /CLAUDE.md
-
+/.build-progress.json
+/.claude-session
+build_instructions.txt
 # Node
 node_modules/
 npm-debug.log*

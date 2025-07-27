@@ -56,6 +56,53 @@ A powerful automation system that uses Claude and MCP servers to generate produc
   ./build.sh --regen-claude-md
   ```
 
+- **Force restart build:**
+  ```bash
+  ./build.sh --force-restart
+  ```
+
+### Build Progress and Resume
+
+The build process is split into phases that are tracked in `.build-progress.json`:
+
+1. **MCP Setup**: Installation of required MCP servers
+2. **Init Claude**: Initialization of Claude agents
+3. **Generate Specs**: Creation of enhanced specifications
+4. **Architecture Design**: System architecture and API design
+5. **Code Implementation**: Service implementation
+6. **Infrastructure Setup**: Docker and deployment configuration
+7. **Testing**: Implementation of test suite
+8. **Security Audit**: Security review and documentation
+
+Each phase is tracked and can be resumed if the build is interrupted. The build script will:
+- Automatically detect the last completed phase
+- Resume from the next incomplete phase
+- Skip completed phases unless forced to restart
+- Show progress summary after completion
+
+**Progress File**: `.build-progress.json`
+```json
+{
+    "steps": {
+        "mcp_setup": false,
+        "init_claude": false,
+        "generate_specs": false,
+        "architecture_design": false,
+        "code_implementation": false,
+        "infrastructure_setup": false,
+        "testing": false,
+        "security_audit": false
+    },
+    "last_updated": "",
+    "current_step": ""
+}
+```
+
+To force a complete rebuild:
+```bash
+./build.sh --force-restart
+```
+
 ### Manual MCP Server Installation
 
 If you need to manually install/reinstall MCP servers:
