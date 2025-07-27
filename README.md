@@ -1,202 +1,186 @@
-# Claude AutoBuilder
+# Munero
 
-A powerful automation system that uses Claude and MCP servers to generate production-ready code from specifications.
+An autonomous build system using Claude SDK that provides continuous feedback and improvement loops for your projects. It can analyze requirements, generate specifications, and build complete applications while continuously testing, validating, and improving the codebase.
 
-## Prerequisites
+## Features
 
-- Node.js and npm installed
-- Claude CLI installed and configured
-- Git installed
+- 🤖 **Autonomous Building**: Analyzes requirements and builds complete applications
+- 🔄 **Continuous Feedback**: Tests, validates, and improves code in real-time
+- 🧪 **Comprehensive Testing**: Implements full test pyramid with coverage analysis
+- 🛡️ **Security First**: Continuous security auditing and vulnerability checks
+- 📈 **Learning System**: Improves over time by learning from build patterns
+- 🔌 **MCP Integration**: Seamless integration with Model Context Protocol servers
+- 🎯 **Spec Generation**: Creates enhanced, machine-optimized specifications
+- 📊 **Quality Monitoring**: Continuous code quality and performance tracking
 
-## Project Structure
+## Installation
 
-```
-.
-├── specs/          # Your source specifications (add your specs here)
-├── src/           # Generated code and enhanced specifications
-│   └── specs/     # Machine-optimized specs generated from /specs
-├── .claude/       # Claude configuration and agents
-└── CLAUDE.md      # Project documentation (auto-generated)
-```
-
-## Getting Started
-
-1. **Clone the repository:**
-   ```bash
-   git clone <repository-url>
-   cd <repository-name>
-   ```
-
-2. **Add your specifications:**
-   - Place your specification files in the `/specs` directory
-   - Use markdown format (`.md`) for best results
-   - Include requirements, architecture details, and technical specifications
-
-3. **Run the build process:**
-   ```bash
-   ./build.sh
-   ```
-   This will:
-   - Install required MCP servers (first run only)
-   - Initialize Claude agents
-   - Generate enhanced specs in `src/specs`
-   - Generate production code in `src`
-
-## Available Commands
-
-### Build Script Options
-
-- **Standard build:**
-  ```bash
-  ./build.sh
-  ```
-
-- **Regenerate CLAUDE.md:**
-  ```bash
-  ./build.sh --regen-claude-md
-  ```
-
-- **Force restart build:**
-  ```bash
-  ./build.sh --force-restart
-  ```
-
-### Build Progress and Resume
-
-The build process is split into phases that are tracked in `.build-progress.json`:
-
-1. **MCP Setup**: Installation of required MCP servers
-2. **Init Claude**: Initialization of Claude agents
-3. **Generate Specs**: Creation of enhanced specifications
-4. **Architecture Design**: System architecture and API design
-5. **Code Implementation**: Service implementation
-6. **Infrastructure Setup**: Docker and deployment configuration
-7. **Testing**: Implementation of test suite
-8. **Security Audit**: Security review and documentation
-
-Each phase is tracked and can be resumed if the build is interrupted. The build script will:
-- Automatically detect the last completed phase
-- Resume from the next incomplete phase
-- Skip completed phases unless forced to restart
-- Show progress summary after completion
-
-**Progress File**: `.build-progress.json`
-```json
-{
-    "steps": {
-        "mcp_setup": false,
-        "init_claude": false,
-        "generate_specs": false,
-        "architecture_design": false,
-        "code_implementation": false,
-        "infrastructure_setup": false,
-        "testing": false,
-        "security_audit": false
-    },
-    "last_updated": "",
-    "current_step": ""
-}
-```
-
-To force a complete rebuild:
 ```bash
-./build.sh --force-restart
+npm install munero
 ```
 
-### Manual MCP Server Installation
+## Quick Start
 
-If you need to manually install/reinstall MCP servers:
+```typescript
+import { BuildManager } from 'munero';
+
+// Initialize the build manager
+const builder = new BuildManager({
+  project: {
+    name: "my-project",
+    version: "1.0.0"
+  }
+});
+
+// Build from a prompt
+await builder.runBuild({
+  prompt: "Create a secure Express.js API with user authentication"
+});
+
+// Or build from existing specs
+await builder.runBuild({
+  specsDir: "./specs"
+});
+```
+
+## Documentation
+
+### Build Process
+
+The system follows an autonomous agent loop:
+
+1. **Plan**: Analyzes requirements and creates build plan
+2. **Execute**: Implements code and runs tests
+3. **Observe**: Monitors results and quality
+4. **Reflect**: Analyzes outcomes and suggests improvements
+5. **Re-plan**: Updates build plan based on feedback
+
+### Configuration
+
+```typescript
+const config = {
+  build: {
+    maxIterations: 10,
+    timeout: 3600000,
+    costLimit: 100
+  },
+  validation: {
+    security: "high",
+    performance: "medium",
+    coverage: 90
+  }
+};
+
+const builder = new BuildManager(config);
+```
+
+### MCP Servers
+
+Required MCP servers are automatically installed and managed:
+
+- filesystem: File operations
+- sequential-thinking: Process planning
+- memory-bank: Context retention
+- puppeteer: Browser automation
+- apidog: API documentation
+- supabase: Database operations
+- github: Code organization
+
+### Feedback Loop
+
+```typescript
+const feedbackLoop = new FeedbackLoopManager({
+  validation: {
+    functional: functionalCriteria,
+    quality: qualityCriteria,
+    performance: performanceCriteria,
+    security: securityCriteria
+  }
+});
+
+builder.attachFeedbackLoop(feedbackLoop);
+```
+
+## Advanced Usage
+
+### Custom Validation
+
+```typescript
+const validation = {
+  rules: [
+    {
+      type: "security",
+      check: async (code) => {
+        // Custom security validation
+      }
+    }
+  ],
+  thresholds: {
+    coverage: 90,
+    performance: 95
+  }
+};
+
+await builder.runBuild({
+  prompt: "Create a microservice",
+  validation
+});
+```
+
+### Agent Configuration
+
+```typescript
+const agents = {
+  enabled: [
+    "test-engineer",
+    "code-reviewer",
+    "security-auditor"
+  ],
+  configurations: {
+    "test-engineer": {
+      coverage: 90,
+      testTypes: ["unit", "integration", "e2e"]
+    }
+  }
+};
+
+const builder = new BuildManager({ agents });
+```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
 ```bash
-./setupmcp.sh
+# Clone the repository
+git clone https://github.com/yourusername/munero.git
+
+# Install dependencies
+npm install
+
+# Run tests
+npm test
+
+# Build
+npm run build
 ```
 
-## MCP Servers Used
+## License
 
-The system uses several MCP servers for different functionalities:
+MIT - see [LICENSE](LICENSE) for details.
 
-- **Core:**
-  - `filesystem`: File operations
-  - `sequential-thinking`: Process planning
-  - `memory-bank`: Context retention
+## Security
 
-- **Browser & API:**
-  - `puppeteer`: Browser automation
-  - `fetch`: HTTP requests
-  - `browser-tools`: Web tools
-  - `apidog`: API documentation
+See [SECURITY.md](SECURITY.md) for security policy and reporting vulnerabilities.
 
-- **Database & Version Control:**
-  - `supabase`: Database operations
-  - `github`: Code organization
+## Support
 
-- **Integration:**
-  - `slack`: Slack integration
-  - `notion`: Notion integration
-  - `zapier`: Automation integration
+- 📚 [Documentation](https://yourusername.github.io/munero)
+- 🐛 [Issue Tracker](https://github.com/yourusername/munero/issues)
+- 💬 [Discussions](https://github.com/yourusername/munero/discussions)
 
-## Development Process
+## Roadmap
 
-1. **Specification Phase:**
-   - Write your specifications in `/specs`
-   - Use clear, detailed markdown files
-   - Include all requirements and constraints
-
-2. **Build Phase:**
-   - The system generates enhanced specs in `src/specs`
-   - Agents analyze and optimize the specifications
-   - Additional documentation is generated
-
-3. **Code Generation:**
-   - Architecture is designed based on specs
-   - Code is implemented using specialist agents
-   - Infrastructure configurations are created
-   - Tests are generated following the pyramid strategy
-   - Security audit is performed
-
-4. **Output:**
-   - All generated code is placed in `./src`
-   - Documentation is updated in `CLAUDE.md`
-   - Tests are included with the code
-
-## Testing Strategy
-
-The system follows a testing pyramid approach:
-- 80% Unit tests
-- 15% Integration tests
-- 5% End-to-end tests
-- Aims for 90% code coverage
-
-## Best Practices
-
-1. **Specifications:**
-   - Be detailed and explicit
-   - Include edge cases and constraints
-   - Define clear acceptance criteria
-
-2. **Version Control:**
-   - Keep specifications in version control
-   - Review generated code before committing
-   - Use feature branches for major changes
-
-3. **Documentation:**
-   - Review generated `CLAUDE.md`
-   - Keep specifications up to date
-   - Document any manual modifications
-
-## Troubleshooting
-
-- If build fails, check:
-  1. Specification files exist in `/specs`
-  2. MCP servers are installed properly
-  3. Claude CLI is configured correctly
-
-- To reinstall MCP servers:
-  1. Delete `.mcp_installed` directory
-  2. Run `./build.sh` again
-
-## Security Notes
-
-- API keys and secrets should be managed through environment variables
-- Security audit is performed on generated code
-- OAuth 2.0 and AES256 encryption are implemented where required
-
+See our [project roadmap](https://github.com/yourusername/munero/projects/1) for upcoming features and improvements. 

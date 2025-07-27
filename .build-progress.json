@@ -1,0 +1,14 @@
+{
+  "steps": {
+    "mcp_setup": true,
+    "init_claude": true,
+    "generate_specs": false,
+    "architecture_design": false,
+    "code_implementation": false,
+    "infrastructure_setup": false,
+    "testing": false,
+    "security_audit": false
+  },
+  "last_updated": "2025-07-27T15:52:40Z",
+  "current_step": "init_claude"
+}
