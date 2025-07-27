@@ -9,296 +9,302 @@ munero init [project-name] [options]
 
 ### 1. Project Structure Creation
 ```
-[project-name]/
-├── .claude/
-│   └── agents/          # Claude agents directory
-├── specs/               # Source specifications
-│   └── .gitkeep
-├── src/                # Generated code
-│   └── .gitkeep
-├── munero.config.js    # Project configuration
-├── .gitignore
-└── README.md
+project-name/
+├── src/              # Generated code directory
+│   └── specs/        # Generated specifications
+├── specs/            # User specifications
+├── tests/            # Test suite
+├── .munero/          # Munero configuration
+│   ├── agents/       # Agent configurations
+│   ├── feedback/     # Feedback loop data
+│   └── state/        # Build state
+└── docs/            # Documentation
 ```
 
 ### 2. MCP Server Installation
-Based on our setupmcp.sh, automatically install core MCP servers:
-
 ```typescript
-const CORE_MCP_SERVERS = {
-  // Core Functionality
-  filesystem: {
-    command: "npx -y @modelcontextprotocol/server-filesystem",
-    required: true
-  },
-  "sequential-thinking": {
-    command: "npx -y @modelcontextprotocol/server-sequential-thinking",
-    required: true
-  },
-  "memory-bank": {
-    command: "npx -y @modelcontextprotocol/server-memory-bank",
-    required: true
-  },
-
-  // Browser & API Tools
-  puppeteer: {
-    command: "npx -y @modelcontextprotocol/server-puppeteer",
-    required: false
-  },
-  fetch: {
-    command: "npx -y @kazuph/mcp-fetch",
-    required: false
-  },
-  "browser-tools": {
-    command: "npx -y @agentdeskai/browser-tools-mcp@1.2.1",
-    required: false
-  },
-  apidog: {
-    command: "npx -y @apitoolkit/mcp-apidog",
-    required: false
-  },
-
-  // Database & Version Control
-  supabase: {
-    command: "npx -y @supabase-community/mcp-supabase",
-    required: false
-  },
-  github: {
-    command: "npx -y @mcp/github",
-    required: false
-  },
-
-  // Integration Platforms
-  slack: {
-    command: "npx -y @mcp/slack",
-    required: false
-  },
-  notion: {
-    command: "npx -y @mcp/notion",
-    required: false
-  },
-  zapier: {
-    command: "npx -y @mcp/zapier",
-    required: false
-  }
-};
+const CORE_MCP_SERVERS = [
+  'filesystem',
+  'sequential-thinking',
+  'memory-bank',
+  'puppeteer',
+  'fetch',
+  'browser-tools',
+  'apidog',
+  'supabase',
+  'github',
+  'slack',
+  'notion',
+  'zapier'
+];
 ```
 
 ### 3. Default Configuration
-Creates munero.config.js with:
-
 ```javascript
+// munero.config.js
 module.exports = {
   project: {
-    name: "project-name",
-    version: "0.1.0"
+    name: 'project-name',
+    version: '0.1.0'
+  },
+
+  build: {
+    maxIterations: 10,
+    minCoverage: 90,
+    maxCriticalIssues: 0,
+    timeout: 60,
+    specs: './specs'
+  },
+
+  feedback: {
+    autoRetry: true,
+    maxRetries: 3,
+    metrics: ['coverage', 'issues', 'performance'],
+    learningEnabled: true
   },
 
   mcp: {
-    // Core servers always installed
-    required: [
-      "filesystem",
-      "sequential-thinking",
-      "memory-bank"
+    servers: CORE_MCP_SERVERS,
+    timeout: 5000,
+    retries: 3
+  },
+
+  agents: {
+    default: [
+      'test-engineer',
+      'code-reviewer',
+      'security-auditor',
+      'performance-analyst'
     ],
-    // Optional servers available
-    optional: [
-      "puppeteer",
-      "fetch",
-      "browser-tools",
-      "apidog",
-      "supabase",
-      "github",
-      "slack",
-      "notion",
-      "zapier"
-    ],
-    // Server-specific configurations
     config: {
-      filesystem: {
-        paths: ["./src", "./specs"]
+      'test-engineer': {
+        coverage: 90,
+        testTypes: ['unit', 'integration', 'e2e']
+      },
+      'security-auditor': {
+        scanLevel: 'deep',
+        compliance: ['owasp-top-10']
       }
     }
   },
 
-  build: {
-    outputDir: "./src",
-    timeout: 30,
-    maxCost: 100,
-    validation: "high"
-  },
-
-  agents: {
-    directory: ".claude/agents",
-    enabled: [
-      "architect",
-      "developer",
-      "test-engineer",
-      "security-auditor"
-    ]
+  validation: {
+    continuous: true,
+    criteria: {
+      coverage: 90,
+      issues: {
+        critical: 0,
+        major: 5
+      },
+      performance: {
+        lighthouse: 90
+      }
+    }
   }
 };
 ```
 
 ### 4. Agent Setup
-Initialize `.claude/agents` with our predefined agents:
-
 ```typescript
 const DEFAULT_AGENTS = {
-  architect: {
-    role: "System architect focusing on design patterns and best practices",
+  'test-engineer': {
+    role: 'Testing and Quality Assurance',
     capabilities: [
-      "architecture-design",
-      "system-planning",
-      "pattern-recognition"
+      'test generation',
+      'coverage analysis',
+      'bug detection'
     ]
   },
-  developer: {
-    role: "Senior developer with full-stack expertise",
+  'code-reviewer': {
+    role: 'Code Quality and Standards',
     capabilities: [
-      "code-generation",
-      "refactoring",
-      "optimization"
+      'pattern recognition',
+      'code smell detection',
+      'style enforcement'
     ]
   },
-  "test-engineer": {
-    role: "Testing specialist focusing on comprehensive coverage",
+  'security-auditor': {
+    role: 'Security Analysis',
     capabilities: [
-      "test-generation",
-      "coverage-analysis",
-      "performance-testing"
+      'vulnerability scanning',
+      'dependency audit',
+      'compliance checking'
     ]
   },
-  "security-auditor": {
-    role: "Security expert ensuring code safety",
+  'performance-analyst': {
+    role: 'Performance Optimization',
     capabilities: [
-      "vulnerability-scanning",
-      "security-patterns",
-      "compliance-checking"
+      'bottleneck detection',
+      'resource analysis',
+      'optimization suggestions'
     ]
   }
 };
 ```
 
 ## Command Options
-
 ```bash
 # Basic initialization
 munero init my-project
 
-# Initialize with specific MCP servers
-munero init my-project --mcp "puppeteer,apidog,github"
+# Custom configuration
+munero init my-project --config custom.config.js
 
-# Initialize with all MCP servers
-munero init my-project --mcp-all
+# Specify MCP servers
+munero init my-project --mcp filesystem,sequential-thinking
 
-# Initialize with specific agents
-munero init my-project --agents "architect,developer"
+# Custom agent selection
+munero init my-project --agents test-engineer,security-auditor
 
-# Initialize with template
-munero init my-project --template react-app
+# Interactive mode
+munero init my-project --interactive
+
+# Skip certain setup steps
+munero init my-project --skip-mcp --skip-agents
 ```
 
 ## Interactive Mode
+1. Project Information
+   - Project name
+   - Description
+   - Version
+   - License
 
-When run without options, provides interactive prompts:
+2. MCP Server Selection
+   - Choose from available servers
+   - Configure server options
+   - Test connections
 
-```bash
-$ munero init my-project
+3. Agent Configuration
+   - Select active agents
+   - Configure agent settings
+   - Set up collaboration rules
 
-📦 Project Setup
-? Choose project type › 
-  ❯ Web Application
-    API Service
-    CLI Tool
-    Library
-    Full Stack App
+4. Build Configuration
+   - Set iteration limits
+   - Define success criteria
+   - Configure timeouts
+   - Set up validation rules
 
-🔌 MCP Servers
-? Select additional MCP servers › 
-  ✓ filesystem
-  ✓ sequential-thinking
-  ✓ memory-bank
-  ❯ ◯ puppeteer
-    ◯ fetch
-    ◯ browser-tools
-    ◯ apidog
-    ◯ supabase
-
-🤖 Agents
-? Select agents to enable › 
-  ✓ architect
-  ✓ developer
-  ❯ ◯ test-engineer
-    ◯ security-auditor
-```
+5. Feedback Loop Setup
+   - Configure metrics collection
+   - Set up learning system
+   - Define improvement criteria
+   - Configure progress tracking
 
 ## Post-Installation
+1. Dependency Installation
+   ```bash
+   npm install
+   ```
 
-After initialization:
-1. Installs selected MCP servers
-2. Sets up agent configurations
-3. Creates project structure
-4. Initializes git repository
-5. Installs dependencies
-6. Shows next steps
+2. MCP Server Verification
+   ```bash
+   munero mcp verify
+   ```
 
-```bash
-✅ Project initialized successfully!
+3. Agent Initialization
+   ```bash
+   munero agents init
+   ```
 
-Next steps:
-1. cd my-project
-2. Review munero.config.js
-3. Add your specs in /specs
-4. Run 'munero build' to start building
-
-Available commands:
-- munero build "Create a React app"
-- munero build --specs ./specs
-- munero dev --watch
-```
+4. Initial Build Test
+   ```bash
+   munero build --test
+   ```
 
 ## Error Handling
 
+### Installation Errors
 ```typescript
-interface InitError {
-  type: "mcp" | "agent" | "config" | "filesystem";
-  server?: string;
-  message: string;
-  resolution: string[];
-}
-
-// Example error handling
-try {
-  await initProject(options);
-} catch (error: InitError) {
-  if (error.type === "mcp") {
-    console.error(`Failed to install MCP server: ${error.server}`);
-    console.log("Resolution steps:");
-    error.resolution.forEach(step => console.log(`- ${step}`));
-  }
-}
+type InstallError =
+  | MCPServerError
+  | AgentSetupError
+  | ConfigurationError
+  | DependencyError;
 ```
+
+### Recovery Strategies
+1. Automatic retry for network issues
+2. Fallback configurations
+3. Skip problematic components
+4. Manual intervention prompts
 
 ## Integration with Build Process
 
-The init command ensures that when you run a build:
-1. All necessary MCP servers are available
-2. Agents are properly configured
-3. Project structure is ready
-4. Configuration is optimized for the project type
-
-This means you can immediately run commands like:
-
-```bash
-# Build from prompt
-munero build "Create a React calculator" 
-
-# Build from specs
-munero build --specs ./specs
-
-# Start development mode
-munero dev --watch
+### State Initialization
+```typescript
+interface BuildState {
+  project: ProjectConfig;
+  mcp: MCPServerStatus[];
+  agents: AgentStatus[];
+  feedback: FeedbackLoopConfig;
+  metrics: MetricsConfig;
+}
 ```
 
-And the system will have all necessary MCP servers and agents ready to use. 
+### Progress Tracking
+```typescript
+interface ProgressTracker {
+  currentPhase: string;
+  completedSteps: string[];
+  errors: Error[];
+  metrics: BuildMetrics;
+}
+```
+
+### Feedback Loop Integration
+```typescript
+interface FeedbackLoop {
+  metrics: string[];
+  thresholds: Record<string, number>;
+  learning: LearningConfig;
+  validation: ValidationConfig;
+}
+```
+
+## File Templates
+
+### README.md
+```markdown
+# Project Name
+
+## Overview
+[Project description]
+
+## Getting Started
+1. Installation
+2. Configuration
+3. Usage
+
+## Development
+- Build Process
+- Testing
+- Deployment
+
+## Documentation
+- API Reference
+- Architecture
+- Contributing
+```
+
+### .gitignore
+```
+node_modules/
+dist/
+.munero/state/
+*.log
+```
+
+### package.json
+```json
+{
+  "name": "project-name",
+  "version": "0.1.0",
+  "scripts": {
+    "build": "munero build",
+    "dev": "munero dev",
+    "test": "munero test"
+  }
+}
+``` 

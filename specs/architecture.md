@@ -1,231 +1,236 @@
-# Build Manager Architecture
+# Munero Architecture
 
 ## System Components
 
-### BuildManager
-The core class that orchestrates the entire build process. It:
-- Manages the lifecycle of builds
-- Coordinates between different services
-- Handles event emission
-- Manages state transitions
+### 1. BuildManager
+The core orchestrator that manages the entire build process.
 
-### Services
+#### Responsibilities
+- Initializing the build environment
+- Managing the feedback loop
+- Coordinating agents
+- Handling state persistence
+- Managing MCP servers
+- Monitoring build progress
 
-#### MCPService
-Handles all MCP server interactions:
-```typescript
-interface MCPService {
-  checkServer(name: string): Promise<ServerStatus>;
-  installServer(name: string): Promise<void>;
-  configureServer(name: string, config: ServerConfig): Promise<void>;
-  monitorHealth(): void;
-}
-```
+#### Key Features
+- Event-driven architecture
+- State persistence
+- Error recovery
+- Progress tracking
+- Resource management
 
-#### SessionService
-Manages Claude sessions:
-```typescript
-interface SessionService {
-  create(): Promise<Session>;
-  resume(sessionId: string): Promise<Session>;
-  save(session: Session): Promise<void>;
-  cleanup(maxAge?: number): Promise<void>;
-}
-```
+### 2. FeedbackLoopManager
+Manages the continuous improvement cycle.
 
-#### CostService
-Tracks and manages build costs:
-```typescript
-interface CostService {
-  trackCost(amount: number): void;
-  getCurrentCost(): number;
-  checkLimit(limit: number): boolean;
-  getProjection(progress: number): number;
-}
-```
+#### Components
+- PlanningSystem
+  - Spec analysis
+  - Task prioritization
+  - Resource allocation
+  
+- ExecutionSystem
+  - Build orchestration
+  - Task execution
+  - State tracking
+  
+- ObservationSystem
+  - Metrics collection
+  - Test execution
+  - Performance monitoring
+  
+- ReflectionSystem
+  - Result analysis
+  - Pattern recognition
+  - Learning database
+  
+- ReplanningSystem
+  - Strategy adjustment
+  - Task reprioritization
+  - Resource reallocation
 
-#### MetricsService
-Collects and reports build metrics:
-```typescript
-interface MetricsService {
-  recordDuration(phase: string, duration: number): void;
-  recordMemory(usage: number): void;
-  recordApiCalls(count: number): void;
-  generateReport(): BuildMetrics;
-}
-```
+### 3. AgentSystem
+Manages specialized agents and their coordination.
 
-### Utils
+#### Components
+- AgentManager
+  - Agent lifecycle
+  - State management
+  - Communication
+  
+- AgentRegistry
+  - Agent registration
+  - Capability tracking
+  - Resource allocation
+  
+- AgentCoordinator
+  - Task distribution
+  - Conflict resolution
+  - Result aggregation
 
-#### ProgressTracker
-Handles build progress tracking:
-```typescript
-interface ProgressTracker {
-  updateProgress(phase: string, progress: number): void;
-  getCurrentPhase(): string;
-  getOverallProgress(): number;
-  estimateTimeRemaining(): number;
-}
-```
+### 4. StateManager
+Handles persistent state across iterations.
 
-#### ErrorHandler
-Centralizes error handling:
-```typescript
-interface ErrorHandler {
-  handleError(error: Error): void;
-  recover(state: BuildState): Promise<void>;
-  logError(error: Error): void;
-}
-```
+#### Components
+- BuildState
+  - Current progress
+  - Resource status
+  - Error states
+  
+- IterationState
+  - Success metrics
+  - Failed attempts
+  - Improvement tracking
+  
+- LearningState
+  - Pattern database
+  - Solution cache
+  - Performance history
+
+### 5. EventSystem
+Manages system-wide events and communication.
+
+#### Event Types
+- BuildEvents
+  - Progress updates
+  - State changes
+  - Resource events
+  
+- AgentEvents
+  - Task completion
+  - Error notifications
+  - Resource requests
+  
+- SystemEvents
+  - Configuration changes
+  - Service status
+  - Error conditions
+
+### 6. ValidationSystem
+Ensures quality and correctness.
+
+#### Components
+- SpecValidator
+  - Requirement checking
+  - Edge case validation
+  - Consistency verification
+  
+- CodeValidator
+  - Static analysis
+  - Dynamic testing
+  - Performance testing
+  
+- SecurityValidator
+  - Vulnerability scanning
+  - Dependency checking
+  - Compliance verification
+
+### 7. CLISystem
+Handles user interaction.
+
+#### Components
+- CommandProcessor
+  - Input parsing
+  - Command routing
+  - Output formatting
+  
+- ProgressReporter
+  - Status updates
+  - Error reporting
+  - Metric display
 
 ## State Management
 
-### BuildState
-```typescript
-interface BuildState {
-  status: BuildStatus;
-  currentPhase: string;
-  progress: number;
-  costs: CostMetrics;
-  errors: ErrorLog[];
-  sessionId?: string;
-  mcpServers: ServerStatus[];
-}
-```
+### 1. Persistence Layer
+- File-based state
+- Memory cache
+- State versioning
 
-### State Transitions
-```mermaid
-stateDiagram-v2
-    [*] --> Initializing
-    Initializing --> ConfiguringMCP
-    ConfiguringMCP --> PreparingBuild
-    PreparingBuild --> Building
-    Building --> Completing
-    Building --> Failed
-    Completing --> [*]
-    Failed --> [*]
-    
-    Building --> Paused
-    Paused --> Building
-```
+### 2. State Types
+- BuildState
+- AgentState
+- ValidationState
+- MetricsState
 
-## Event System
-
-### Core Events
-```typescript
-type BuildEvent =
-  | { type: "buildStart"; options: BuildOptions }
-  | { type: "buildProgress"; phase: string; progress: number }
-  | { type: "buildComplete"; result: BuildResult }
-  | { type: "buildError"; error: Error }
-  | { type: "costUpdate"; cost: number }
-  | { type: "mcpStatus"; status: ServerStatus[] };
-```
-
-### Event Flow
-```mermaid
-sequenceDiagram
-    participant BM as BuildManager
-    participant MCP as MCPService
-    participant Session as SessionService
-    participant Cost as CostService
-    
-    BM->>MCP: Check servers
-    MCP-->>BM: Server status
-    BM->>Session: Create/Resume
-    Session-->>BM: Session ready
-    loop Building
-        BM->>Cost: Track costs
-        Cost-->>BM: Cost update
-        BM->>BM: Emit progress
-    end
-```
-
-## Configuration
-
-### Build Configuration
-```typescript
-interface BuildConfig {
-  maxCost?: number;
-  timeout?: number;
-  mcpServers: MCPServerConfig[];
-  retryStrategy: RetryConfig;
-  logging: LogConfig;
-  metrics: MetricsConfig;
-}
-```
-
-### Environment Variables
-```bash
-CLAUDE_BUILD_MAX_COST=10
-CLAUDE_BUILD_TIMEOUT=3600
-CLAUDE_BUILD_LOG_LEVEL=info
-CLAUDE_BUILD_METRICS_ENABLED=true
-```
-
-## Security
-
-### Authentication
-- API key management
-- MCP server credentials
-- Session token handling
-
-### Resource Protection
-- Cost limits
-- Timeout enforcement
-- Resource quotas
-- Rate limiting
-
-### Data Safety
-- Session data encryption
-- Secure configuration storage
-- Audit logging
+### 3. State Operations
+- Save/Restore
+- Merge
+- Diff
+- Rollback
 
 ## Error Handling
 
-### Error Types
-```typescript
-type BuildError =
-  | MCPServerError
-  | SessionError
-  | CostLimitError
-  | TimeoutError
-  | ResourceError;
-```
+### 1. Error Types
+- BuildErrors
+- AgentErrors
+- ValidationErrors
+- SystemErrors
 
-### Recovery Strategies
-- Automatic retry with backoff
-- Session state preservation
-- Graceful degradation
+### 2. Recovery Strategies
+- Automatic retry
+- State rollback
 - Resource cleanup
+- Error escalation
 
-## Performance Considerations
+### 3. Error Reporting
+- Log aggregation
+- Error analysis
+- Trend detection
+- Alert system
 
-### Optimization Points
-- Session reuse
-- MCP server connection pooling
-- Batch operations
-- Caching strategies
-- Memory management
+## Performance
 
-### Monitoring Points
-- API latency
+### 1. Resource Management
 - Memory usage
 - CPU utilization
-- Cost efficiency
-- Build duration
+- I/O optimization
+- Cache strategy
+
+### 2. Optimization
+- Task parallelization
+- Resource pooling
+- Cache optimization
+- Load balancing
+
+### 3. Monitoring
+- Metrics collection
+- Performance analysis
+- Resource tracking
+- Bottleneck detection
+
+## Security
+
+### 1. Access Control
+- Resource isolation
+- Permission management
+- Secure defaults
+
+### 2. Data Security
+- State encryption
+- Secure storage
+- Safe defaults
+
+### 3. Audit
+- Action logging
+- Change tracking
+- Security scanning
 
 ## Integration Points
 
-### External Systems
-- Claude SDK
-- MCP Servers
-- Logging systems
-- Metrics collectors
+### 1. External Systems
+- Version control
 - CI/CD systems
+- Documentation
+- Monitoring
 
-### APIs
-- REST endpoints
-- WebSocket events
-- CLI interface
-- SDK exports 
+### 2. MCP Servers
+- Filesystem
+- Sequential thinking
+- Memory management
+- External tools
+
+### 3. SDK Integration
+- Claude SDK
+- Testing frameworks
+- Build tools
+- Security tools 

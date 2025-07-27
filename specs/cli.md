@@ -1,7 +1,6 @@
 # Munero CLI Specification
 
 ## Command Structure
-
 ```bash
 munero <command> [options]
 ```
@@ -16,298 +15,233 @@ munero build "Create a React calculator with dark mode"
 # Build from specs directory
 munero build --specs ./specs
 
-# Build with specific configuration
-munero build --specs ./specs --config munero.config.js
+# Build with specific iteration limit
+munero build --max-iterations 5
 
-# Resume previous build
-munero build --resume <session-id>
+# Build with specific success criteria
+munero build --min-coverage 90 --max-critical-issues 0
+```
 
-# Force restart a build
-munero build --force-restart "Create an Express.js API"
+### Iteration Control
+```bash
+# Pause current build
+munero pause
+
+# Resume paused build
+munero resume
+
+# Skip current iteration
+munero next
+
+# Restart current iteration
+munero retry
+
+# Force complete current build
+munero complete
+```
+
+### Progress Monitoring
+```bash
+# Show build status
+munero status
+
+# Show detailed metrics
+munero metrics
+
+# Watch build progress
+munero watch
+
+# Show iteration history
+munero history
+
+# Export build report
+munero report
 ```
 
 ### Project Commands
 ```bash
-# Initialize a new project
+# Initialize new project
 munero init [project-name]
 
-# Add MCP servers
-munero mcp add <server-name>
+# Add MCP server
+munero mcp add <server>
 
-# List installed MCP servers
+# List MCP servers
 munero mcp list
 
 # Remove MCP server
-munero mcp remove <server-name>
+munero mcp remove <server>
 ```
 
 ### Development Commands
 ```bash
-# Start development mode (watches specs and rebuilds)
-munero dev --specs ./specs
+# Start development mode
+munero dev
 
-# Run tests on generated code
+# Run tests
 munero test
 
-# Run security audit
-munero audit
+# Validate specs
+munero validate
 
-# Format generated code
-munero format
+# Clean build artifacts
+munero clean
 ```
 
-### Session Management
+### Session Commands
 ```bash
 # List active sessions
 munero sessions list
 
-# Show session details
-munero sessions show <session-id>
-
 # Resume specific session
-munero sessions resume <session-id>
+munero sessions resume <id>
 
-# Clean up old sessions
+# Clean old sessions
 munero sessions clean
-```
-
-### Validation Commands
-```bash
-# Validate specs
-munero validate specs ./specs
-
-# Validate generated code
-munero validate code ./src
-
-# Run full validation suite
-munero validate all
 ```
 
 ## Global Options
 
+### Build Control
 ```bash
-# Common options available for most commands
---verbose               # Detailed output
---silent               # Minimal output
---output-format json   # JSON output format
---log-level <level>    # Set logging level
---config <path>        # Custom config file
+--verbose               # Enable verbose output
+--quiet                # Suppress non-essential output
+--debug                # Enable debug mode
+--config <path>        # Use specific config file
 --no-color            # Disable colored output
 ```
 
-## Build Options
-
+### Build Options
 ```bash
-# Specific options for build command
---specs <path>         # Specs directory path
---output <path>        # Output directory (default: ./src)
---force-restart        # Force restart build
---resume <session-id>  # Resume specific session
---timeout <minutes>    # Build timeout
---max-cost <number>    # Maximum cost limit
---agents <list>        # Specific agents to use
---validation <level>   # Validation level (low|medium|high)
+--specs <path>         # Path to specs directory
+--max-iterations      # Maximum iterations allowed
+--min-coverage        # Minimum test coverage required
+--max-critical-issues # Maximum critical issues allowed
+--timeout            # Build timeout in minutes
+--force              # Force rebuild
 ```
 
-## Development Options
-
+### Development Options
 ```bash
-# Options for development mode
---watch                # Watch for changes
---hot-reload          # Hot reload generated code
---port <number>        # Dev server port
---host <host>         # Dev server host
+--watch               # Watch for changes
+--hot                # Enable hot reload
+--port <number>      # Development server port
+--host <host>        # Development server host
 ```
 
-## Configuration File (munero.config.js)
-
+## Configuration File
 ```javascript
+// munero.config.js
 module.exports = {
-  // Project settings
-  project: {
-    name: "my-app",
-    version: "1.0.0"
-  },
-
-  // Build configuration
+  // Build Configuration
   build: {
-    outputDir: "./src",
-    timeout: 30, // minutes
-    maxCost: 100,
-    validation: "high"
+    maxIterations: 10,
+    minCoverage: 90,
+    maxCriticalIssues: 0,
+    timeout: 60,
+    specs: './specs'
   },
 
-  // Agent configuration
-  agents: {
-    enabled: ["test-engineer", "security-auditor"],
-    config: {
-      "test-engineer": {
-        coverage: 90
-      }
-    }
+  // Iteration Control
+  iteration: {
+    autoRetry: true,
+    maxRetries: 3,
+    retryDelay: 1000
   },
 
-  // MCP server configuration
+  // Progress Tracking
+  progress: {
+    metrics: ['coverage', 'issues', 'performance'],
+    reportFormat: 'html',
+    watchInterval: 1000
+  },
+
+  // MCP Servers
   mcp: {
-    servers: ["filesystem", "sequential-thinking"],
-    config: {
-      filesystem: {
-        paths: ["./src", "./specs"]
-      }
-    }
+    servers: ['filesystem', 'sequential-thinking'],
+    timeout: 5000,
+    retries: 3
   },
 
-  // Validation rules
-  validation: {
-    specs: {
-      required: ["README.md", "api.md"],
-      schema: "./spec-schema.json"
-    },
-    code: {
-      coverage: 90,
-      complexity: 20,
-      duplication: 5
-    }
-  },
-
-  // Development settings
+  // Development
   dev: {
     port: 3000,
+    host: 'localhost',
     hot: true,
-    watch: ["./specs/**/*"]
+    watch: true
+  },
+
+  // Testing
+  test: {
+    coverage: true,
+    watch: false,
+    updateSnapshots: false
   }
 };
 ```
 
 ## SDK Integration Features
 
-### Hooks System
+### Build Events
 ```typescript
-// Register build hooks
-munero.on('build:start', (context) => {
-  // Pre-build tasks
-});
+munero.on('build:start', (options) => {});
+munero.on('build:progress', (progress) => {});
+munero.on('build:complete', (result) => {});
+munero.on('build:error', (error) => {});
+```
 
-munero.on('build:complete', (result) => {
-  // Post-build tasks
-});
-
-// Custom validation hooks
-munero.on('validate:code', (code) => {
-  // Custom validation
-});
+### Iteration Events
+```typescript
+munero.on('iteration:start', (number) => {});
+munero.on('iteration:progress', (status) => {});
+munero.on('iteration:complete', (result) => {});
 ```
 
 ### Progress Events
 ```typescript
-// Real-time build progress
-munero.on('progress', (progress) => {
-  console.log(`${progress.phase}: ${progress.percentage}%`);
-});
-
-// Cost tracking
-munero.on('cost:update', (cost) => {
-  console.log(`Current cost: $${cost}`);
-});
-```
-
-### Agent Communication
-```typescript
-// Interact with specific agents
-munero.agent('test-engineer').suggest({
-  type: 'test',
-  component: 'Calculator',
-  coverage: 'edge-cases'
-});
-
-// Get agent feedback
-munero.agent('security-auditor').audit({
-  files: ['./src/auth.ts'],
-  level: 'deep'
-});
-```
-
-### Build Pipelines
-```typescript
-// Define custom build pipeline
-munero.pipeline([
-  {
-    name: 'analyze',
-    agent: 'architect',
-    task: 'design-system'
-  },
-  {
-    name: 'implement',
-    agent: 'developer',
-    task: 'code-generation'
-  },
-  {
-    name: 'test',
-    agent: 'test-engineer',
-    task: 'full-coverage'
-  }
-]);
-```
-
-### Workspace Integration
-```typescript
-// IDE integration
-munero.workspace.onSave((file) => {
-  // Trigger partial rebuild
-});
-
-munero.workspace.suggest((code) => {
-  // Get real-time suggestions
-});
-```
-
-### Learning System
-```typescript
-// Train on successful builds
-munero.learn({
-  type: 'pattern',
-  context: 'api-design',
-  example: successfulBuild
-});
-
-// Get recommendations
-const suggestions = await munero.suggest({
-  type: 'architecture',
-  context: currentBuild
-});
+munero.on('metrics:update', (metrics) => {});
+munero.on('status:change', (status) => {});
+munero.on('report:generate', (report) => {});
 ```
 
 ## Examples
 
 ### Basic Build
 ```bash
-# Build a calculator app
-munero build "Create a React calculator with TypeScript, tests, and documentation"
+# Build from prompt
+munero build "Create a React app with authentication"
+
+# Build from specs with options
+munero build --specs ./specs --max-iterations 5 --min-coverage 90
 ```
 
-### Advanced Build
+### Progress Monitoring
 ```bash
-# Build with specific requirements
-munero build \
-  --specs ./specs \
-  --output ./src \
-  --validation high \
-  --agents "architect,developer,tester" \
-  --config custom.config.js
+# Watch build progress with metrics
+munero watch --metrics
+
+# Generate detailed report
+munero report --format html --output ./report
 ```
 
-### Development Mode
+### Development Flow
 ```bash
-# Start dev mode with hot reload
-munero dev --specs ./specs --hot-reload --port 3000
+# Initialize project
+munero init my-project
+
+# Start development mode
+munero dev --watch --hot
+
+# Run tests with coverage
+munero test --coverage
 ```
 
-### Validation
+### Session Management
 ```bash
-# Full validation suite
-munero validate all \
-  --specs ./specs \
-  --code ./src \
-  --coverage 90 \
-  --complexity 20
+# List and resume session
+munero sessions list
+munero sessions resume abc123
+
+# Clean old sessions
+munero sessions clean --older-than 7d
 ``` 
